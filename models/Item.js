@@ -7,7 +7,7 @@ const itemSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   availability: { type: Boolean, default: true },
   category: { type: String, required: true },
-  image: { type: String, required: true }
+  image: { type: String, required: true },
 });
 
 const Item = mongoose.model('Item', itemSchema);

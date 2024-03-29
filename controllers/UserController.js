@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Item = require('../models/Item');
+
 const mySecret = process.env.JWT_SECRET || 'techdinos';
 
 class UserController {
@@ -128,7 +129,7 @@ class UserController {
         return res.status(401).json({ message: 'Unauthorized: Invalid token' });
       }
 
-      const userId = decodedToken.userId;
+      const { userId } = decodedToken;
       await Item.deleteMany({ owner: userId });
 
       const user = await User.findByIdAndDelete(userId);

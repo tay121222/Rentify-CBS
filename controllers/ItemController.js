@@ -178,7 +178,7 @@ class ItemController {
       const { itemId } = req.params;
       const { availability } = req.body;
 
-      const token = req.headers.authorization?.split(' ')[1];
+      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
       if (!token) {
         return res.status(401).json({ message: 'Unauthorized: No token provided' });
       }
