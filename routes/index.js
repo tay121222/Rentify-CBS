@@ -11,5 +11,6 @@ router.use('/', homeRoutes);
 router.use('/auth', authRoutes);
 router.use('/user', userRoutes);
 router.use('/item', itemRoutes);
+router.use('/profile', userRoutes);
 
 module.exports = router;

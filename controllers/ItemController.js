@@ -178,6 +178,16 @@ class ItemController {
       const { itemId } = req.params;
       const { availability } = req.body;
 
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) {
+        return res.status(401).json({ message: 'Unauthorized: No token provided' });
+      }
+
+      const decodedToken = jwt.verify(token, mySecret);
+      if (!decodedToken) {
+        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+      }
+
       const item = await Item.findById(itemId);
       if (!item) {
         return res.status(404).json({ message: 'Item not found' });
