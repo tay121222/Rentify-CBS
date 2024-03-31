@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Item = require('../models/Item');
+const { sendPasswordResetEmail } = require('../utils/email');
 
 const mySecret = process.env.JWT_SECRET || 'techdinos';
 
@@ -140,6 +142,73 @@ class UserController {
       return res.status(200).json({ message: 'Account deleted successfully' });
     } catch (error) {
       console.error('Error deleting account:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  static async initiatePasswordReset(req, res) {
+    try {
+      const { email } = req.body;
+
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const resetToken = jwt.sign({ userId: user._id }, mySecret, { expiresIn: '1h' });
+      user.resetToken = resetToken;
+      await user.save();
+
+      await sendPasswordResetEmail(email, resetToken);
+
+      return res.status(200).json({ message: 'Password reset email sent successfully' });
+    } catch (error) {
+      console.error('Error initiating password reset:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  static async renderPasswordResetForm(req, res) {
+    try {
+      const resetToken = req.params.token;
+      res.render('password-reset-form', { token: resetToken });
+    } catch (error) {
+      console.error('Error rendering password reset form:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  static async resetPassword(req, res) {
+    try {
+      const { token } = req.params;
+      const { newPassword } = req.body;
+
+      const decodedToken = jwt.verify(token, mySecret);
+      const currentTime = Date.now();
+
+      if (decodedToken.exp * 1000 < currentTime) {
+        return res.status(400).json({ message: 'Reset token has expired' });
+      }
+
+      const { userId } = decodedToken;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+      await user.save();
+
+      return res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      if (error.name === 'JsonWebTokenError') {
+        return res.status(400).json({ message: 'Invalid reset token' });
+      }
+      if (error.name === 'TokenExpiredError') {
+        return res.status(400).json({ message: 'Reset token has expired' });
+      }
       return res.status(500).json({ message: 'Internal server error' });
     }
   }
