@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   fullName: { type: String, required: true },
   phoneNumber: { type: String },
+  verified: { type: Boolean, default: false },
+  verificationToken: { type: String },
 });
 
 const User = mongoose.model('User', userSchema);
