@@ -1,9 +1,8 @@
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Item = require('../models/Item');
-const { sendPasswordResetEmail } = require('../utils/email');
+const { sendPasswordResetEmail, sendVerificationEmail } = require('../utils/email');
 
 const mySecret = process.env.JWT_SECRET || 'techdinos';
 
@@ -19,6 +18,8 @@ class UserController {
         return res.status(400).json({ message: 'User already exists' });
       }
 
+      const verificationToken = jwt.sign({ email }, mySecret, { expiresIn: '24h' });
+
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({
         username,
@@ -26,10 +27,12 @@ class UserController {
         password: hashedPassword,
         fullName,
         phoneNumber,
+        verificationToken,
       });
 
       await newUser.save();
 
+      sendVerificationEmail(email, verificationToken);
       return res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
       console.error('Error registering user:', error);
@@ -209,6 +212,26 @@ class UserController {
       if (error.name === 'TokenExpiredError') {
         return res.status(400).json({ message: 'Reset token has expired' });
       }
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  static async verifyEmail(req, res) {
+    try {
+      const { token } = req.params;
+
+      const user = await User.findOne({ verificationToken: token });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found or already verified' });
+      }
+
+      user.verified = true;
+      user.verificationToken = undefined;
+      await user.save();
+
+      return res.status(200).json({ message: 'Email verification successful' });
+    } catch (error) {
+      console.error('Error verifying email:', error);
       return res.status(500).json({ message: 'Internal server error' });
     }
   }

@@ -12,5 +12,6 @@ router.delete('/deleteAccount', UserController.deleteAccount);
 router.post('/password/reset', UserController.initiatePasswordReset);
 //router.get('/reset/:token', UserController.renderPasswordResetForm);
 router.post('/pwd/reset/:token', UserController.resetPassword);
+router.get('/verify/:token', UserController.verifyEmail);
 
 module.exports = router;
