@@ -6,11 +6,13 @@ const homeRoutes = require('./homeRoutes');
 const authRoutes = require('./authRoutes');
 const userRoutes = require('./userRoutes');
 const itemRoutes = require('./itemRoutes');
+const reservationRoutes = require('./reservationRoutes');
 
 router.use('/', homeRoutes);
 router.use('/auth', authRoutes);
 router.use('/user', userRoutes);
 router.use('/item', itemRoutes);
 router.use('/profile', userRoutes);
+router.use('/reservation', reservationRoutes);
 
 module.exports = router;
