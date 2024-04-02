@@ -9,10 +9,11 @@ function verifyToken(req, res, next) {
 
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET || mySecret);
-    if (!decodedToken.userId) {
+    if (!decodedToken || !decodedToken.userId) {
       return res.status(401).json({ message: 'Unauthorized: Invalid token' });
     }
     req.userId = decodedToken.userId;
+    //console.log('Decoded user ID:', req.userId);
     next();
   } catch (error) {
     console.error('Error verifying token:', error);

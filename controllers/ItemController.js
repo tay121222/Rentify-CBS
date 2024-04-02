@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const Item = require('../models/Item');
 
 class ItemController {
@@ -14,7 +13,7 @@ class ItemController {
 
   static async addItem(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const {
         name, description, price, category, image,
       } = req.body;
@@ -40,7 +39,7 @@ class ItemController {
 
   static async updateItem(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const { itemId } = req.params;
       const item = await Item.findById(itemId);
       if (!item) {
@@ -58,7 +57,7 @@ class ItemController {
       item.image = req.body.image || item.image;
 
       if (req.body.availability !== undefined) {
-	item.availability = req.body.availability;
+        item.availability = req.body.availability;
       }
       await item.save();
 
@@ -71,7 +70,7 @@ class ItemController {
 
   static async deleteItem(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const { itemId } = req.params;
       const item = await Item.findById(itemId);
       if (!item) {
