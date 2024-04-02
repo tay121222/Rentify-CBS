@@ -2,21 +2,10 @@ const jwt = require('jsonwebtoken');
 const Reservation = require('../models/Reservation');
 const Item = require('../models/Item');
 
-const mySecret = process.env.JWT_SECRET || 'techdinos';
-
 class ReservationController {
   static async createReservation(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, process.env.JWT_SECRET || mySecret);
-      if (!decodedToken.userId) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
-      const { userId } = decodedToken;
+      const userId = req.userId;
       const { itemId, startDate, endDate } = req.body;
 
       const item = await Item.findById(itemId);
@@ -54,15 +43,7 @@ class ReservationController {
 
   static async updateReservation(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken.userId) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
+      const userId = req.userId;
       const { reservationId } = req.params;
       const { startDate, endDate } = req.body;
 
@@ -71,7 +52,7 @@ class ReservationController {
         return res.status(404).json({ message: 'Reservation not found' });
       }
 
-      if (decodedToken.userId !== reservation.userId.toString()) {
+      if (userId !== reservation.userId.toString()) {
         return res.status(403).json({ message: 'Forbidden: You are not authorized to update this reservation' });
       }
 
@@ -88,16 +69,7 @@ class ReservationController {
 
   static async cancelReservation(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken.userId) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
-
+      const userId = req.userId;
       const { reservationId } = req.params;
       const reservation = await Reservation.findById(reservationId);
 
@@ -109,7 +81,7 @@ class ReservationController {
         return res.status(400).json({ message: 'Reservation is already cancelled' });
       }
 
-      if (decodedToken.userId !== reservation.userId.toString()) {
+      if (userId !== reservation.userId.toString()) {
         return res.status(403).json({ message: 'Forbidden: You are not authorized to cancel this reservation' });
       }
 
@@ -119,6 +91,17 @@ class ReservationController {
     } catch (error) {
       console.error('Error cancelling reservation:', error);
       return res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+  static async getUserReservations(req, res) {
+    try {
+      const userId = req.userId;
+      const reservations = await Reservation.find({ user: userId });
+      res.status(200).json({ reservations });
+    } catch (error) {
+      console.error('Error fetching user reservations:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
   }
 }

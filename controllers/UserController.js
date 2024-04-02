@@ -42,14 +42,8 @@ class UserController {
 
   static async getUserFromToken(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-
-      const user = await User.findById(decodedToken.userId);
+      const userId = req.userId;
+      const user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -68,18 +62,10 @@ class UserController {
 
   static async updateUserProfile(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
-      const { userId } = decodedToken;
-      const { name, email, phoneNumber } = req.body;
+      const userId = req.userId;
+      const { fullName, email, phoneNumber } = req.body;
 
-      const updatedUser = await User.findByIdAndUpdate(userId, { name, email, phoneNumber }, { new: true });
+      const updatedUser = await User.findByIdAndUpdate(userId, { fullName, email, phoneNumber }, { new: true });
 
       return res.status(200).json({ message: 'User profile updated successfully', user: updatedUser });
     } catch (error) {
@@ -90,15 +76,8 @@ class UserController {
 
   static async changePassword(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken) { return res.status(401).json({ message: 'Unauthorized: Invalid token' }); }
-      const user = await User.findById(decodedToken.userId);
+      const userId = req.userId;
+      const user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -124,17 +103,7 @@ class UserController {
 
   static async deleteAccount(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
-
-      const { userId } = decodedToken;
+      const userId = req.userId;
       await Item.deleteMany({ owner: userId });
 
       const user = await User.findByIdAndDelete(userId);

@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Item = require('../models/Item');
 
-const mySecret = process.env.JWT_SECRET || 'techdinos';
-
 class ItemController {
   static async getAllItems(req, res) {
     try {
@@ -16,20 +14,11 @@ class ItemController {
 
   static async addItem(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken.userId) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
-
+      const userId = req.userId;
       const {
         name, description, price, category, image,
       } = req.body;
-      const owner = decodedToken.userId;
+      const owner = userId;
 
       const newItem = new Item({
         name,
@@ -51,23 +40,14 @@ class ItemController {
 
   static async updateItem(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken.userId) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
-
+      const userId = req.userId;
       const { itemId } = req.params;
       const item = await Item.findById(itemId);
       if (!item) {
         return res.status(404).json({ message: 'Item not found' });
       }
 
-      if (item.owner.toString() !== decodedToken.userId) {
+      if (item.owner.toString() !== userId) {
         return res.status(403).json({ message: 'Forbidden: You do not have permission to update this item' });
       }
 
@@ -77,6 +57,9 @@ class ItemController {
       item.category = req.body.category || item.category;
       item.image = req.body.image || item.image;
 
+      if (req.body.availability !== undefined) {
+	item.availability = req.body.availability;
+      }
       await item.save();
 
       return res.status(200).json({ message: 'Item updated successfully', item });
@@ -88,23 +71,14 @@ class ItemController {
 
   static async deleteItem(req, res) {
     try {
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken.userId) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
-
+      const userId = req.userId;
       const { itemId } = req.params;
       const item = await Item.findById(itemId);
       if (!item) {
         return res.status(404).json({ message: 'Item not found' });
       }
 
-      if (item.owner.toString() !== decodedToken.userId) {
+      if (item.owner.toString() !== userId) {
         return res.status(403).json({ message: 'Forbidden: You do not have permission to delete this item' });
       }
 
@@ -177,16 +151,6 @@ class ItemController {
     try {
       const { itemId } = req.params;
       const { availability } = req.body;
-
-      const token = req.headers.authorization ? req.headers.authorization.split(' ')[1] : null;
-      if (!token) {
-        return res.status(401).json({ message: 'Unauthorized: No token provided' });
-      }
-
-      const decodedToken = jwt.verify(token, mySecret);
-      if (!decodedToken) {
-        return res.status(401).json({ message: 'Unauthorized: Invalid token' });
-      }
 
       const item = await Item.findById(itemId);
       if (!item) {
