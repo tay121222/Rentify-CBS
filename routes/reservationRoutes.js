@@ -1,5 +1,6 @@
 const express = require('express');
 const verifyToken = require('../utils/auth');
+
 const router = express.Router();
 const ReservationController = require('../controllers/ReservationController');
 

@@ -1,10 +1,11 @@
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Item = require('../models/Item');
 const { sendPasswordResetEmail, sendVerificationEmail } = require('../utils/email');
 
-const mySecret = process.env.JWT_SECRET || 'techdinos';
+const mySecret = process.env.JWT_SECRET;
 
 class UserController {
   static async register(req, res) {
@@ -42,7 +43,7 @@ class UserController {
 
   static async getUserFromToken(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -62,7 +63,7 @@ class UserController {
 
   static async updateUserProfile(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const { fullName, email, phoneNumber } = req.body;
 
       const updatedUser = await User.findByIdAndUpdate(userId, { fullName, email, phoneNumber }, { new: true });
@@ -76,7 +77,7 @@ class UserController {
 
   static async changePassword(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const user = await User.findById(userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -103,7 +104,7 @@ class UserController {
 
   static async deleteAccount(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       await Item.deleteMany({ owner: userId });
 
       const user = await User.findByIdAndDelete(userId);

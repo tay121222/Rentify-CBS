@@ -1,11 +1,10 @@
-const jwt = require('jsonwebtoken');
 const Reservation = require('../models/Reservation');
 const Item = require('../models/Item');
 
 class ReservationController {
   static async createReservation(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const { itemId, startDate, endDate } = req.body;
 
       const item = await Item.findById(itemId);
@@ -43,7 +42,7 @@ class ReservationController {
 
   static async updateReservation(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const { reservationId } = req.params;
       const { startDate, endDate } = req.body;
 
@@ -69,7 +68,7 @@ class ReservationController {
 
   static async cancelReservation(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const { reservationId } = req.params;
       const reservation = await Reservation.findById(reservationId);
 
@@ -96,7 +95,7 @@ class ReservationController {
 
   static async getUserReservations(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const reservations = await Reservation.find({ user: userId });
       res.status(200).json({ reservations });
     } catch (error) {

@@ -1,8 +1,8 @@
 const express = require('express');
 
 const router = express.Router();
-const ItemController = require('../controllers/ItemController.js');
-const verifyToken = require('../utils/auth')
+const ItemController = require('../controllers/ItemController');
+const verifyToken = require('../utils/auth');
 
 router.post('/add', verifyToken, ItemController.addItem);
 router.put('/update/:itemId', verifyToken, ItemController.updateItem);

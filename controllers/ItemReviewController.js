@@ -91,7 +91,7 @@ class ItemReviewController {
 
   static async getItemReviewsByUserId(req, res) {
     try {
-      const userId = req.userId;
+      const { userId } = req;
       const itemReviews = await ItemReview.find({ user: userId });
 
       res.status(200).json({ itemReviews });
@@ -103,15 +103,15 @@ class ItemReviewController {
 
   static async getItemReviewsByUserIdd(req, res) {
     try {
-        const userId = req.params.userId;
-        const itemReviews = await ItemReview.find({ user: userId });
+      const { userId } = req.params;
+      const itemReviews = await ItemReview.find({ user: userId });
 
-        res.status(200).json({ itemReviews });
+      res.status(200).json({ itemReviews });
     } catch (error) {
-        console.error('Error fetching item reviews by user ID:', error);
-        res.status(500).json({ message: 'Internal server error' });
+      console.error('Error fetching item reviews by user ID:', error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-}
+  }
 }
 
 module.exports = ItemReviewController;
