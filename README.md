@@ -19,7 +19,7 @@ Rentify is built using the following technologies:
 - **bcrypt**: Password hashing for enhanced security
 - **Nodemailer**: Sending emails for user verification and password reset
 - **Dotenv**: Environment variable management
-- **Postman**: Testing API endpoints
+- **Postman or Terminal**: Testing API endpoints
 
 ## Usage
 
@@ -66,6 +66,33 @@ The following are some of the key API endpoints available in Rentify:
   ```bash
   curl -X GET http://localhost:3000/user/verify/:verificationtoken
 
+- **Update Password**:
+  ```bash
+  curl -X PUT http://localhost:3000/profile/changePassword -H "Authorization: Bearer <your token>" -H "Content-Type: application/json" -d '{"currentPassword": "techdinos", "newPassword": "xtech1"}'
+
+- **Update User Profile**:
+  ```bash
+  curl -X PUT http://localhost:3000/profile/updateProfile -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -d '{"fullName": "Samuel Taylor", "email": "xtechit@gmail.com", "phoneNumber": "0209043207"}'
+
+- **Delete User Account**:
+  ```bash
+  curl -X DELETE http://localhost:3000/profile/deleteAccount -H "Authorization: Bearer <your_token>"
+
+- **Request Password Reset**:
+  - Postman URL: `http://localhost:3000/user/password/reset`
+  - Raw JSON: 
+    ```json
+    {
+        "email": "tay121222@gmail.com"
+    }
+    ```
+    ```bash
+    curl -X POST http://localhost:3000/user/password/reset -H "Content-Type: application/json" -d '{"email": "example@example.com"}'
+
+- **Password Reset with reset Token**:
+  ```bash
+  curl -X POST http://localhost:3000/user/pwd/reset/:token -H "Content-Type: application/json" -d '{"newPassword": "new_password"}'
+
 #### Item Management:
 - **Add Item**:
   ```bash
@@ -86,6 +113,26 @@ The following are some of the key API endpoints available in Rentify:
 - **Get Item Based on ItemID**:
   ```bash
   curl -X GET 'http://localhost:3000/item/:itemId'
+
+- **Get all items based on Owner**:
+  ```bash
+  curl -X GET http://localhost:3000/item/owner/<ownerid>
+
+- **Update Item Availability**:
+  ```bash
+  curl -X PUT http://localhost:3000/item/update/:itemId  -H "Content-Type: application/json" -H "Authorization: Bearer <your_jwt_token>" -d '{"availability":true}'
+
+  # or
+
+  curl -X PUT http://localhost:3000/item/:itemid/availability  -H "Content-Type: application/json" -H "Authorization: Bearer <jwt token>" -d '{"availability":true}'
+
+- **Get items Based on Category**:
+  ```bash
+  curl -X GET 'http://localhost:3000/item/category/Home%20Equipment'
+
+- **Search for an Item**:
+  ```bash
+  curl -X GET 'http://localhost:3000/item/search/keyword?q=Drilling%20Machine'
 
 #### Reservation Management:
 - **Create Reservation for Item**:
