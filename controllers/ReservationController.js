@@ -95,8 +95,9 @@ class ReservationController {
 
   static async getUserReservations(req, res) {
     try {
-      const { userId } = req;
-      const reservations = await Reservation.find({ user: userId });
+      const userId = req.userId;
+      console.log(userId);
+      const reservations = await Reservation.find({ userId: userId });
       res.status(200).json({ reservations });
     } catch (error) {
       console.error('Error fetching user reservations:', error);

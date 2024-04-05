@@ -7,7 +7,7 @@ class ItemReviewController {
       const { itemId, rating, comment } = req.body;
       const { userId } = req;
 
-      const reservation = await Reservation.findOne({ item: itemId, user: userId });
+      const reservation = await Reservation.findOne({ itemId: itemId, userId: userId });
       if (!reservation) {
         return res.status(403).json({ message: 'You can only review items you have booked.' });
       }
