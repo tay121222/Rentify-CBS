@@ -44,6 +44,9 @@ To run the application locally, follow these steps:
    ```bash
    MONGODB_URI=mongodb://<ip address>:27017/rentify
    JWT_SECRET=techdinos
+   EMAIL_PWD=email_pass
+
+   Email Password will be used in SMTP settings in utils/email.js
 
 4. Start the server:
    ```bash
