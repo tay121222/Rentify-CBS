@@ -1,12 +1,12 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  host: 'mail.xtechsoftwarelib.com',
+  host: 'mail.example.com',
   port: 465,
   secure: true,
   auth: {
-    user: 'techsupport@xtechsoftwarelib.com',
-    pass: process.env.EMAIL_PWD || 'XTECHtechsupport',
+    user: 'example@gmail.com',
+    pass: process.env.EMAIL_PWD || 'password',
   },
   tls: {
     rejectUnauthorized: false,
@@ -29,7 +29,7 @@ async function sendPasswordResetEmail(userEmail, resetToken) {
     subject: 'Password Reset Request',
     text: 'You are receiving this email because you (or someone else) has requested to reset the password for your account.\n\n'
             + 'Please click on the following link, or paste this into your browser to complete the process:\n\n'
-            + `http://localhost:3000/user/reset/${resetToken}\n\n`
+            + `http://localhost:3000/user/pwd/reset/${resetToken}\n\n`
             + 'If you did not request this, please ignore this email and your password will remain unchanged.\n',
   };
 
